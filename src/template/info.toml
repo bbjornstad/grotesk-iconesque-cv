@@ -47,6 +47,10 @@ accent_color = "#d4d2cc"
 # deafult value is 71%
 left_pane_width = "71%"
 
+[layout.spacing]
+major = { size = '4pt' }
+minor = { scope = "page", size = '4pt' }
+
 [layout.text]
 font = "HK Grotesk"
 size = "10pt"
@@ -57,6 +61,12 @@ light = "#ededef"
 medium = "#78787e"
 dark = "#3c3c42"
 
+[layout.text.icons]
+precedence = ["tabler", "octicons", "fontawesome", "academicons"]
+
+[layout.list]
+marker = ""
+
 [language.en]
 subtitle = "Software Engineer with a knack for human-friendly AI solutions"
 
@@ -64,5 +74,8 @@ subtitle = "Software Engineer with a knack for human-friendly AI solutions"
 subtitle = "Ingeniero de software con un talento para soluciones de IA amigables para humanos"
 
 [import]
-path = "@preview/grotesk-cv:1.0.2"
+path = "@local/grotesk-iconesque-cv:1.0.2"
 fontawesome = "@preview/fontawesome:0.5.0"
+octicons = "@preview/octique:0.1.0"
+tabler_icons = '@preview/use-tabler-icons:0.11.0'
+academicons = "@preview/use-academicons:0.1.0"
