@@ -5,7 +5,19 @@
 #import meta.import.academicons: *
 
 #let iconify(icon, ..attributes) = {
+  let fetcher = (
+    tabler: tabler-icon,
+    octicon: octique,
+    awesome: fa-icon,
+    academicon: ai-icon,
+  )
 
+  for (name, fetch) in fetcher {
+    let icon = fetch(icon)
+    if not icon == none {
+      return text(icon, ..attributes)
+    }
+  }
 }
 #let section-title-style(str, color, ..attributes) = {
   text(
@@ -41,7 +53,12 @@
   ..attributes,
 ) = {
   text(
-    ..arguments(size: 12pt, style: "italic", fill: rgb(color), ..attributes),
+    ..arguments(
+      size: 12pt,
+      style: "italic",
+      fill: rgb(color),
+      ..attributes,
+    ),
     title,
   )
 }
@@ -61,7 +78,7 @@
       ..attributes,
     ),
     if include-icons {
-      fa-icon(icon) + h(10pt) + txt
+      iconify(icon) + h(6pt) + txt
     } else {
       txt
     },
@@ -93,17 +110,19 @@
   let include-icons = metadata.personal.include_icons
   table(
     ..arguments(
-      columns: (1fr, 1fr),
+      columns: (auto, auto, auto, auto, auto),
       stroke: none,
       ..attributes,
     ),
-    ..info.pairs().map(((key, val)) => info-block-style(
-      icons.at(key),
-      info-value(val, ..attributes),
-      color,
-      include-icons,
-      ..attributes,
-    ))
+    ..info.pairs().map(
+      ((key, val)) => info-block-style(
+        icons.at(key),
+        info-value(val, ..attributes),
+        color,
+        include-icons,
+        ..attributes,
+      ),
+    )
   )
 }
 
@@ -122,13 +141,15 @@
       stroke: none,
       ..attributes,
     ),
-    ..info.pairs().map(((key, val)) => info-block-style(
-      icons.at(key),
-      info-value(val, ..attributes),
-      color,
-      include-icons,
-      ..attributes,
-    ))
+    ..info.pairs().map(
+      ((key, val)) => info-block-style(
+        icons.at(key),
+        info-value(val, ..attributes),
+        color,
+        include-icons,
+        ..attributes,
+      ),
+    )
   )
 }
 
@@ -143,12 +164,11 @@
       columns: 1fr,
       inset: 0pt,
       stroke: none,
-      row-gutter: 4mm,
+      row-gutter: 3mm,
       ..attributes,
     ),
     [#name-block(
-      metadata.personal.first_name + " " +
-      metadata.personal.last_name,
+      metadata.personal.first_name + " " + metadata.personal.last_name,
       metadata.layout.text.color.dark,
       ..attributes,
     )],
@@ -175,12 +195,11 @@
       columns: 1fr,
       inset: 0pt,
       stroke: none,
-      row-gutter: 4mm,
+      row-gutter: 2mm,
       ..attributes,
     ),
     [#name-block(
-      metadata.personal.first_name + " " +
-      metadata.personal.last_name,
+      metadata.personal.first_name + " " + metadata.personal.last_name,
       metadata.layout.text.color.dark,
       ..attributes,
     )],
@@ -201,7 +220,6 @@
     box(
       ..arguments(
         clip: true,
-        radius: 50%,
         ..attributes,
       ),
       photo,
@@ -209,9 +227,6 @@
   } else {
     box(..arguments(
       clip: true,
-      stroke: 5pt + yellow,
-      radius: 50%,
-      fill: yellow,
       ..attributes,
     ))
   }
@@ -229,7 +244,7 @@
       columns: cols,
       inset: 0pt,
       stroke: none,
-      column-gutter: 10pt,
+      column-gutter: 8pt,
       align: top,
       ..attributes,
     ),
@@ -248,10 +263,19 @@
   use-photo: false,
   ..attributes,
 ) = {
+  let header-width
+  let photo-width
+  if use-photo {
+    header_width = 74%
+    photo-width = 20%
+  } else {
+    header-width = 96%
+    photo-width = 0%
+  }
   cv-header(
     header-table(metadata, ..attributes),
     make-header-photo(photo, use-photo, ..attributes),
-    (74%, 20%),
+    (header-width, photo-width),
     left,
     ..attributes,
   )
@@ -271,7 +295,7 @@
 }
 
 #let cv-section(title, ..attributes) = {
-  let spacer = attributes.at("spacer", h(4pt))
+  let spacer = attributes.at("spacer", h(2pt))
   section-title-style(title, ..attributes)
   spacer
 }
@@ -383,10 +407,10 @@ text(
       inset: (x: 0.4em),
       outset: (y: 0.3em),
       fill: rgb(color),
-      radius: 3pt,
+      radius: 1pt,
       tag-style(tag),
     )
-    h(5pt)
+    h(4pt)
   }
 }
 
@@ -409,7 +433,7 @@ text(
     columns: (3fr, 2fr),
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
+    row-gutter: 2mm,
     [#reference-name-style(name)], [#company-name-style(company)],
     table.cell(colspan: 2)[#phonenumber-style(telephone), #email-style(email)],
   )
@@ -428,7 +452,7 @@ text(
     columns: (3fr, 1fr),
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
+    row-gutter: 2mm,
     [#degree-style(degree)],                                      [#date-style(date)],
     [#institution-style(institution), #location-style(location)],
   )
@@ -440,16 +464,19 @@ text(
   date: "Date",
   company: "Company",
   location: "Location",
+  description: none,
+  itemized: none,
 ) = {
   table(
     columns: (1fr, 1fr),
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
+    row-gutter: 2mm,
     [#degree-style(title)], [#date-style(date)],
-    table.cell(colspan: 2)[#institution-style(company), #location-style(location)],
+    table.cell(colspan: 2)[#institution-style(company),
+    #location-style(location)],
+    table.cell(colspan: 2)[#text(size: 10pt, description) #text(size: 9pt, itemized)]
   )
-  v(5pt)
 }
 
 #let skill-style(skill) = {
@@ -464,7 +491,7 @@ text(
     inset: (x: 0.3em),
     outset: (y: 0.2em),
     fill: rgb(color),
-    radius: 3pt,
+    radius: 1pt,
     skill-style(skill),
   )
 }
@@ -485,28 +512,96 @@ text(
     ..skills.map(sk => skill-tag(color, sk))
   )
 }
+#let personality-style(trait) = {
+  text(
+    weight: "medium",
+    emph(trait),
+  )
+}
 
-#let language-entry(
-  language: "Language",
-  proficiency: "Proficiency",
+#let personality-tag(color, trait) = {
+  box(
+    inset: (x: 0.3em),
+    outset: (y: 0.2em),
+    fill: rgb(color),
+    radius: 1pt,
+    personality-style(trait),
+  )
+}
+
+#let personality-entry(
+  color,
+  cols,
+  align,
+  traits: (),
 ) = {
   table(
-    columns: (1fr, 1fr),
+    columns: if cols == true { (1fr, 1fr) } else { 1fr },
     inset: 0pt,
     stroke: none,
     row-gutter: 3mm,
-    align: left,
-    table.cell(
-      text(
-        weight: "bold",
-        language,
-      ),
-    ), table.cell(
-      align: right,
-      text(
-        weight: "medium",
-        proficiency,
-      ),
+    column-gutter: 3mm,
+    align: align,
+    ..traits.map(hb => personality-tag(color, hb))
+  )
+}
+#let hobby-style(hobby) = {
+  text(
+    weight: "bold",
+    hobby,
+  )
+}
+
+#let hobby-tag(color, hobby) = {
+  box(
+    inset: (x: 0.3em),
+    outset: (y: 0.2em),
+    fill: rgb(color),
+    radius: 1pt,
+    hobby-style(hobby),
+  )
+}
+
+#let hobby-entry(
+  color,
+  cols,
+  align,
+  hobbies: (),
+) = {
+  table(
+    columns: if cols == true { (1fr, 1fr) } else { 1fr },
+    inset: 0pt,
+    stroke: none,
+    row-gutter: 3mm,
+    column-gutter: 3mm,
+    align: align,
+    ..hobbies.map(hb => hobby-tag(color, hb))
+  )
+}
+
+#let language-entry(
+  color,
+  entries: { },
+) = {
+  table(
+    columns: (auto, auto),
+    align: (left, right),
+    inset: 0pt,
+    stroke: none,
+    ..entries.pairs().map(
+      (language, proficiency) => table.cell(colspan: 2, [#box(
+        fill: rgb(color),
+        inset: (x: 0.3em),
+        outset: (y: 0.2em),
+        radius: 1pt,
+        text(weight: "bold", language),
+      )], [#box(
+        fill: rgb(color),
+        inset: (x: 0.3em),
+        outset: (y: 0.2em),
+        radius: 1pt,
+        text(weight: "medium", proficiency),
+      )]),
     )
   )
 }
@@ -529,7 +624,7 @@ text(
     columns: 1fr,
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
+    row-gutter: 2mm,
     align: left,
     recipient-style(name),
     recipient-style(title),
@@ -540,14 +635,14 @@ text(
 
 #let create-panes(left, right, proportion) = {
   grid(
-    columns: (proportion, 96% - proportion),
+    columns: (proportion, 98% - proportion),
     column-gutter: 20pt,
     stack(
-      spacing: 20pt,
+      spacing: 16pt,
       left,
     ),
     stack(
-      spacing: 20pt,
+      spacing: 16pt,
       right,
     ),
   )
@@ -559,7 +654,7 @@ text(
   use-photo: false,
   left-pane: (),
   right-pane: (),
-  left-pane-proportion: 71%,
+  left-pane-proportion: 72%,
   doc,
 ) = {
   set text(

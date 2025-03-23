@@ -61,7 +61,7 @@ light = "#ededef"
 medium = "#78787e"
 dark = "#3c3c42"
 
-[layout.text.icons]
+[layout.icon]
 precedence = ["tabler", "octicons", "fontawesome", "academicons"]
 
 [layout.list]
