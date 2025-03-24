@@ -1,12 +1,32 @@
 #let meta = toml("template/info.toml")
+#import meta.import.tabler_icons: *
+#import meta.import.octicons: *
 #import meta.import.fontawesome: *
+#import meta.import.academicons: *
 
+#let iconify(icon, ..attributes) = {
+  let fetcher = (
+    tabler: tabler-icon,
+    octicon: octique,
+    awesome: fa-icon,
+    academicon: ai-icon,
+  )
 
-#let section-title-style(str, color) = {
+  for (name, fetch) in fetcher {
+    let icon = fetch(icon)
+    if not icon == none {
+      return text(icon, ..attributes)
+    }
+  }
+}
+#let section-title-style(str, color, ..attributes) = {
   text(
-    size: 12pt,
-    weight: "bold",
-    fill: rgb(color),
+    ..arguments(
+      size: 12pt,
+      weight: "bold",
+      fill: rgb(color),
+      ..attributes,
+    ),
     str,
   )
 }
@@ -14,11 +34,15 @@
 #let name-block(
   header-name,
   color,
+  ..attributes,
 ) = {
   text(
-    fill: rgb(color),
-    size: 30pt,
-    weight: "extrabold",
+    ..arguments(
+      fill: rgb(color),
+      size: 30pt,
+      weight: "extrabold",
+      ..attributes,
+    ),
     header-name,
   )
 }
@@ -26,11 +50,15 @@
 #let title-block(
   title,
   color,
+  ..attributes,
 ) = {
   text(
-    size: 12pt,
-    style: "italic",
-    fill: rgb(color),
+    ..arguments(
+      size: 12pt,
+      style: "italic",
+      fill: rgb(color),
+      ..attributes,
+    ),
     title,
   )
 }
@@ -40,120 +68,186 @@
   txt,
   color,
   include-icons,
+  ..attributes,
 ) = {
   text(
-    size: 10pt,
-    fill: rgb(color),
-    weight: "medium",
+    ..arguments(
+      size: 10pt,
+      fill: rgb(color),
+      weight: "medium",
+      ..attributes,
+    ),
     if include-icons {
-      fa-icon(icon) + h(10pt) + txt
+      iconify(icon) + h(6pt) + txt
     } else {
       txt
     },
   )
 }
 
-#let info-value(val) = {
+#let info-value(val, ..attributes) = {
   if type(val) == str {
-    val
+    text(
+      ..attributes,
+      val,
+    )
   } else if type(val) == dictionary {
-    link(val.link, val.label)
+    link(..arguments(
+      val.link,
+      val.label,
+      ..attributes,
+    ))
   }
 }
 
 #let info-block(
   metadata,
+  ..attributes,
 ) = {
   let info = metadata.personal.info
   let icons = metadata.personal.icon
   let color = metadata.layout.text.color.medium
   let include-icons = metadata.personal.include_icons
   table(
-    columns: (1fr, 1fr),
-    stroke: none,
-    ..info.pairs().map(((key, val)) => info-block-style(icons.at(key), info-value(val), color, include-icons))
+    ..arguments(
+      columns: (auto, auto, auto, auto, auto),
+      stroke: none,
+      ..attributes,
+    ),
+    ..info.pairs().map(
+      ((key, val)) => info-block-style(
+        icons.at(key),
+        info-value(val, ..attributes),
+        color,
+        include-icons,
+        ..attributes,
+      ),
+    )
   )
 }
 
 #let make-info-table(
   metadata,
+  ..attributes,
 ) = {
   let color = metadata.layout.text.color.medium
   let info = metadata.personal.info
   let icons = metadata.personal.icon
   let include-icons = metadata.personal.include_icons
   table(
-    columns: 1fr,
-    align: right,
-    stroke: none,
-    ..info.pairs().map(((key, val)) => info-block-style(icons.at(key), info-value(val), color, include-icons))
+    ..arguments(
+      columns: 1fr,
+      align: right,
+      stroke: none,
+      ..attributes,
+    ),
+    ..info.pairs().map(
+      ((key, val)) => info-block-style(
+        icons.at(key),
+        info-value(val, ..attributes),
+        color,
+        include-icons,
+        ..attributes,
+      ),
+    )
   )
 }
 
 #let header-table(
   metadata,
+  ..attributes,
 ) = {
   let lang = metadata.personal.language
   let subtitle = metadata.language.at(lang).at("subtitle")
   table(
-    columns: 1fr,
-    inset: 0pt,
-    stroke: none,
-    row-gutter: 4mm,
-    [#name-block(metadata.personal.first_name + " " + metadata.personal.last_name, metadata.layout.text.color.dark)],
+    ..arguments(
+      columns: 1fr,
+      inset: 0pt,
+      stroke: none,
+      row-gutter: 3mm,
+      ..attributes,
+    ),
+    [#name-block(
+      metadata.personal.first_name + " " + metadata.personal.last_name,
+      metadata.layout.text.color.dark,
+      ..attributes,
+    )],
     [#title-block(
-        subtitle,
-        metadata.layout.text.color.dark,
-      )],
-    [#info-block(metadata)],
+      subtitle,
+      metadata.layout.text.color.dark,
+      ..attributes,
+    )],
+    [#info-block(
+      metadata,
+      ..attributes,
+    )],
   )
 }
 
 #let cover-header-table(
   metadata,
+  ..attributes,
 ) = {
   let lang = metadata.personal.language
   let subtitle = metadata.language.at(lang).at("subtitle")
   table(
-    columns: 1fr,
-    inset: 0pt,
-    stroke: none,
-    row-gutter: 4mm,
-    [#name-block(metadata.personal.first_name + " " + metadata.personal.last_name, metadata.layout.text.color.dark)],
+    ..arguments(
+      columns: 1fr,
+      inset: 0pt,
+      stroke: none,
+      row-gutter: 2mm,
+      ..attributes,
+    ),
+    [#name-block(
+      metadata.personal.first_name + " " + metadata.personal.last_name,
+      metadata.layout.text.color.dark,
+      ..attributes,
+    )],
     [#title-block(
-        subtitle,
-        metadata.layout.text.color.dark,
-      )],
+      subtitle,
+      metadata.layout.text.color.dark,
+      ..attributes,
+    )],
   )
 }
 
 #let make-header-photo(
   photo,
   profile-photo,
+  ..attributes,
 ) = {
   if profile-photo != false {
     box(
-      clip: true,
-      radius: 50%,
+      ..arguments(
+        clip: true,
+        ..attributes,
+      ),
       photo,
     )
   } else {
-    box(
+    box(..arguments(
       clip: true,
-      stroke: 5pt + yellow,
-      radius: 50%,
-      fill: yellow,
-    )
+      ..attributes,
+    ))
   }
 }
 
-#let cv-header(left-comp, right-comp, cols, align) = {
+#let cv-header(
+  left-comp,
+  right-comp,
+  cols,
+  align,
+  ..attributes,
+) = {
   table(
-    columns: cols,
-    inset: 0pt,
-    stroke: none,
-    column-gutter: 10pt,
-    align: top,
+    ..arguments(
+      columns: cols,
+      inset: 0pt,
+      stroke: none,
+      column-gutter: 8pt,
+      align: top,
+      ..attributes,
+    ),
     {
       left-comp
     },
@@ -167,106 +261,134 @@
   metadata,
   photo,
   use-photo: false,
+  ..attributes,
 ) = {
+  let header-width
+  let photo-width
+  if use-photo {
+    header_width = 74%
+    photo-width = 20%
+  } else {
+    header-width = 96%
+    photo-width = 0%
+  }
   cv-header(
-    header-table(metadata),
-    make-header-photo(photo, use-photo),
-    (74%, 20%),
+    header-table(metadata, ..attributes),
+    make-header-photo(photo, use-photo, ..attributes),
+    (header-width, photo-width),
     left,
+    ..attributes,
   )
 }
 
 #let create-cover-header(
   metadata,
+  ..attributes,
 ) = {
   cv-header(
-    cover-header-table(metadata),
-    make-info-table(metadata),
+    cover-header-table(metadata, ..attributes),
+    make-info-table(metadata, ..attributes),
     (65%, 34%),
     left,
+    ..attributes,
   )
 }
 
-
-#let cv-section(title) = {
-  section-title-style(title)
-  h(4pt)
+#let cv-section(title, ..attributes) = {
+  let spacer = attributes.at("spacer", h(2pt))
+  section-title-style(title, ..attributes)
+  spacer
 }
 
-#let date-style(date) = (
-  table.cell(
-    align: right,
-    text(
+#let date-style(date, ..attributes) = (
+table.cell(
+  align: right,
+  text(
+    ..arguments(
       size: 9pt,
       weight: "bold",
       style: "italic",
-      date,
+      ..attributes,
     ),
-  )
+    date,
+  ),
+)
 )
 
-#let company-name-style(company) = {
+#let company-name-style(company, ..attributes) = {
   table.cell(
     align: right,
     text(
-      size: 9pt,
-      weight: "bold",
-      style: "italic",
+      ..arguments(
+        size: 9pt,
+        weight: "bold",
+        style: "italic",
+        ..attributes,
+      ),
       company,
     ),
   )
 }
 
-#let degree-style(degree) = (
-  text(
+#let degree-style(degree, ..attributes) = (
+text(
+  ..arguments(
     weight: "bold",
-    degree,
-  )
+    ..attributes,
+  ),
+  degree,
+)
 )
 
-#let reference-name-style(name) = (
-  text(
+#let reference-name-style(name, ..attributes) = (
+text(
+  ..arguments(
     weight: "bold",
-    name,
-  )
+    ..attributes,
+  ),
+  name,
+)
 )
 
-#let phonenumber-style(phone) = (
-  text(
+#let phonenumber-style(phone, ..attributes) = (
+text(
+  ..arguments(
     size: 9pt,
     style: "italic",
     weight: "medium",
-    phone,
-  )
+    ..attributes,
+  ),
+  phone,
+)
 )
 
 #let institution-style(institution) = (
-  table.cell(
-    text(
-      style: "italic",
-      weight: "medium",
-      institution,
-    ),
-  )
+table.cell(
+  text(
+    style: "italic",
+    weight: "medium",
+    institution,
+  ),
+)
 )
 
 #let location-style(location) = (
-  table.cell(
-    text(
-      style: "italic",
-      weight: "medium",
-      location,
-    ),
-  )
+table.cell(
+  text(
+    style: "italic",
+    weight: "medium",
+    location,
+  ),
+)
 )
 
 #let email-style(email) = (
-  text(
-    size: 9pt,
-    style: "italic",
-    weight: "medium",
-    email,
-  )
+text(
+  size: 9pt,
+  style: "italic",
+  weight: "medium",
+  email,
+)
 )
 
 #let tag-style(str) = {
@@ -285,10 +407,10 @@
       inset: (x: 0.4em),
       outset: (y: 0.3em),
       fill: rgb(color),
-      radius: 3pt,
+      radius: 1pt,
       tag-style(tag),
     )
-    h(5pt)
+    h(4pt)
   }
 }
 
@@ -311,9 +433,8 @@
     columns: (3fr, 2fr),
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
-    [#reference-name-style(name)],
-    [#company-name-style(company)],
+    row-gutter: 2mm,
+    [#reference-name-style(name)], [#company-name-style(company)],
     table.cell(colspan: 2)[#phonenumber-style(telephone), #email-style(email)],
   )
   v(2pt)
@@ -331,8 +452,8 @@
     columns: (3fr, 1fr),
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
-    [#degree-style(degree)], [#date-style(date)],
+    row-gutter: 2mm,
+    [#degree-style(degree)],                                      [#date-style(date)],
     [#institution-style(institution), #location-style(location)],
   )
   v(2pt)
@@ -343,17 +464,19 @@
   date: "Date",
   company: "Company",
   location: "Location",
+  description: none,
+  itemized: none,
 ) = {
   table(
     columns: (1fr, 1fr),
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
-    [#degree-style(title)],
-    [#date-style(date)],
-    table.cell(colspan: 2)[#institution-style(company), #location-style(location)],
+    row-gutter: 2mm,
+    [#degree-style(title)], [#date-style(date)],
+    table.cell(colspan: 2)[#institution-style(company),
+    #location-style(location)],
+    table.cell(colspan: 2)[#text(size: 10pt, description) #text(size: 9pt, itemized)]
   )
-  v(5pt)
 }
 
 #let skill-style(skill) = {
@@ -368,7 +491,7 @@
     inset: (x: 0.3em),
     outset: (y: 0.2em),
     fill: rgb(color),
-    radius: 3pt,
+    radius: 1pt,
     skill-style(skill),
   )
 }
@@ -389,29 +512,96 @@
     ..skills.map(sk => skill-tag(color, sk))
   )
 }
+#let personality-style(trait) = {
+  text(
+    weight: "medium",
+    emph(trait),
+  )
+}
 
-#let language-entry(
-  language: "Language",
-  proficiency: "Proficiency",
+#let personality-tag(color, trait) = {
+  box(
+    inset: (x: 0.3em),
+    outset: (y: 0.2em),
+    fill: rgb(color),
+    radius: 1pt,
+    personality-style(trait),
+  )
+}
+
+#let personality-entry(
+  color,
+  cols,
+  align,
+  traits: (),
 ) = {
   table(
-    columns: (1fr, 1fr),
+    columns: if cols == true { (1fr, 1fr) } else { 1fr },
     inset: 0pt,
     stroke: none,
     row-gutter: 3mm,
-    align: left,
-    table.cell(
-      text(
-        weight: "bold",
-        language,
-      ),
-    ),
-    table.cell(
-      align: right,
-      text(
-        weight: "medium",
-        proficiency,
-      ),
+    column-gutter: 3mm,
+    align: align,
+    ..traits.map(hb => personality-tag(color, hb))
+  )
+}
+#let hobby-style(hobby) = {
+  text(
+    weight: "bold",
+    hobby,
+  )
+}
+
+#let hobby-tag(color, hobby) = {
+  box(
+    inset: (x: 0.3em),
+    outset: (y: 0.2em),
+    fill: rgb(color),
+    radius: 1pt,
+    hobby-style(hobby),
+  )
+}
+
+#let hobby-entry(
+  color,
+  cols,
+  align,
+  hobbies: (),
+) = {
+  table(
+    columns: if cols == true { (1fr, 1fr) } else { 1fr },
+    inset: 0pt,
+    stroke: none,
+    row-gutter: 3mm,
+    column-gutter: 3mm,
+    align: align,
+    ..hobbies.map(hb => hobby-tag(color, hb))
+  )
+}
+
+#let language-entry(
+  color,
+  entries: { },
+) = {
+  table(
+    columns: (auto, auto),
+    align: (left, right),
+    inset: 0pt,
+    stroke: none,
+    ..entries.pairs().map(
+      (language, proficiency) => table.cell(colspan: 2, [#box(
+        fill: rgb(color),
+        inset: (x: 0.3em),
+        outset: (y: 0.2em),
+        radius: 1pt,
+        text(weight: "bold", language),
+      )], [#box(
+        fill: rgb(color),
+        inset: (x: 0.3em),
+        outset: (y: 0.2em),
+        radius: 1pt,
+        text(weight: "medium", proficiency),
+      )]),
     )
   )
 }
@@ -434,7 +624,7 @@
     columns: 1fr,
     inset: 0pt,
     stroke: none,
-    row-gutter: 3mm,
+    row-gutter: 2mm,
     align: left,
     recipient-style(name),
     recipient-style(title),
@@ -445,19 +635,18 @@
 
 #let create-panes(left, right, proportion) = {
   grid(
-    columns: (proportion, 96% - proportion),
+    columns: (proportion, 98% - proportion),
     column-gutter: 20pt,
     stack(
-      spacing: 20pt,
+      spacing: 16pt,
       left,
     ),
     stack(
-      spacing: 20pt,
+      spacing: 16pt,
       right,
     ),
   )
 }
-
 
 #let cv(
   metadata,
@@ -465,7 +654,7 @@
   use-photo: false,
   left-pane: (),
   right-pane: (),
-  left-pane-proportion: 71%,
+  left-pane-proportion: 72%,
   doc,
 ) = {
   set text(

@@ -1,5 +1,4 @@
 #let meta = toml("info.toml")
-
 #import meta.import.path: cv
 #let photo = image("./img/" + meta.personal.profile_image)
 
@@ -34,4 +33,3 @@
   right-pane: import-sections(right-pane),
   left-pane-proportion: eval(meta.layout.left_pane_width),
 )
-
